@@ -1,3 +1,4 @@
+import argparse
 import logging
 import os
 from pathlib import Path
@@ -44,12 +45,48 @@ def _normalize_sentiment(label: str) -> str:
 	return label.lower()
 
 
-def predict_from_csv() -> None:
-	input_csv = os.getenv("PREDICTION_INPUT_CSV", "data/unseen/input.csv")
-	output_csv = os.getenv("PREDICTION_OUTPUT_CSV", "results/predictions.csv")
-	text_column = os.getenv("PREDICTION_TEXT_COLUMN", os.getenv("TEXT_COLUMN", "text"))
-	max_length = _get_int_env("MAX_LENGTH", 256)
-	batch_size = _get_int_env("PREDICTION_BATCH_SIZE", 32)
+def _parse_args() -> argparse.Namespace:
+	parser = argparse.ArgumentParser(description="Run batch sentiment prediction on a CSV file.")
+	parser.add_argument(
+		"--input-file",
+		dest="input_file",
+		default=os.getenv("PREDICTION_INPUT_CSV", "data/unseen/input.csv"),
+		help="Path to the input CSV file.",
+	)
+	parser.add_argument(
+		"--output-file",
+		dest="output_file",
+		default=os.getenv("PREDICTION_OUTPUT_CSV", "results/predictions.csv"),
+		help="Path to the output CSV file.",
+	)
+	parser.add_argument(
+		"--text-column",
+		dest="text_column",
+		default=os.getenv("PREDICTION_TEXT_COLUMN", os.getenv("TEXT_COLUMN", "text")),
+		help="Column name containing input text.",
+	)
+	parser.add_argument(
+		"--max-length",
+		dest="max_length",
+		type=int,
+		default=_get_int_env("MAX_LENGTH", 256),
+		help="Maximum token length per example.",
+	)
+	parser.add_argument(
+		"--batch-size",
+		dest="batch_size",
+		type=int,
+		default=_get_int_env("PREDICTION_BATCH_SIZE", 32),
+		help="Batch size for inference.",
+	)
+	return parser.parse_args()
+
+
+def predict_from_csv(input_csv: str, output_csv: str, text_column: str, max_length: int, batch_size: int) -> None:
+	if max_length <= 0:
+		raise ValueError(f"max_length must be a positive integer. Got: {max_length}")
+	if batch_size <= 0:
+		raise ValueError(f"batch_size must be a positive integer. Got: {batch_size}")
 
 	if not Path(input_csv).exists():
 		raise FileNotFoundError(f"Input CSV not found: {input_csv}")
@@ -88,7 +125,14 @@ def predict_from_csv() -> None:
 
 def main() -> None:
 	try:
-		predict_from_csv()
+		args = _parse_args()
+		predict_from_csv(
+			input_csv=args.input_file,
+			output_csv=args.output_file,
+			text_column=args.text_column,
+			max_length=args.max_length,
+			batch_size=args.batch_size,
+		)
 	except Exception as exc:
 		LOGGER.exception("Batch prediction failed: %s", exc)
 		raise

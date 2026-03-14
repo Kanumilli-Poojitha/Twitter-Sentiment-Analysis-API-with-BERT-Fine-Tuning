@@ -104,10 +104,12 @@ uvicorn src.api:app --host 0.0.0.0 --port 8000
 streamlit run src/ui.py --server.address 0.0.0.0 --server.port 8501
 ```
 
+For local runs, set `API_BASE_URL=http://localhost:8000` in `.env`.
+
 6. Run batch prediction:
 
 ```bash
-python scripts/batch_predict.py
+python scripts/batch_predict.py --input-file data/unseen/predict_data.csv --output-file results/predictions.csv
 ```
 
 ## Docker Run
@@ -123,6 +125,12 @@ Services:
 
 - API: `http://localhost:${API_PORT}`
 - UI: `http://localhost:${UI_PORT}`
+
+Docker Compose overrides `API_BASE_URL` for the UI container to `http://api:8000`.
+
+Sample batch input file:
+
+- `data/unseen/predict_data.csv`
 
 ## API Contract
 
@@ -182,3 +190,34 @@ Live demo:
 
 Author
 K.Poojitha
+
+
+commands used for testing:
+
+python scripts/preprocess.py
+
+dir data\processed
+
+python scripts/train.py
+
+dir model_output
+
+type results\metrics.json
+
+type results\run_summary.json
+
+python -m uvicorn src.api:app --reload
+
+http://localhost:8000/docs
+
+python scripts/batch_predict.py --input-file data/unseen/predict_data.csv --output-file results/predictions.csv
+
+python -m streamlit run src/ui.py
+
+http://localhost:8501
+
+I really enjoyed this movie
+
+docker compose up --build
+
+docker ps
