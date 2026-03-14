@@ -32,6 +32,7 @@ results/
 # =========================
 # Data files
 # =========================
+data/
 data/raw/
 data/processed/
 
