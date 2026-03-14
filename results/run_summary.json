@@ -1,0 +1,30 @@
+{
+  "timestamp_utc": "2026-03-14T07:21:35.443311+00:00",
+  "config": {
+    "model_name": "distilbert-base-uncased",
+    "train_csv_path": "data/processed/train.csv",
+    "test_csv_path": "data/processed/test.csv",
+    "model_output_dir": "model_output",
+    "results_dir": "results",
+    "metrics_path": "results/metrics.json",
+    "run_summary_path": "results/run_summary.json",
+    "text_column": "text",
+    "label_column": "label",
+    "max_length": 256,
+    "num_epochs": 1,
+    "train_batch_size": 8,
+    "eval_batch_size": 8,
+    "learning_rate": 2e-05,
+    "weight_decay": 0.01,
+    "logging_steps": 50,
+    "save_total_limit": 1,
+    "random_seed": 42
+  },
+  "num_train_rows": 10000,
+  "num_test_rows": 2000,
+  "artifacts": {
+    "model_output_dir": "model_output",
+    "metrics_path": "results/metrics.json",
+    "run_summary_path": "results/run_summary.json"
+  }
+}
